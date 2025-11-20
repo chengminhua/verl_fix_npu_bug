@@ -14,6 +14,7 @@
 """
 The main entry point to run the PPO algorithm
 """
+_COMPILE = None
 
 import datetime
 import logging
@@ -27,27 +28,6 @@ import torch.distributed
 from codetiming import Timer
 from omegaconf import DictConfig, OmegaConf
 from contextlib import contextmanager
-
-_COMPILE = None
-
-def init_torch_compile(compile):
-    global _COMPILE
-    _COMPILE = compile
-
-@contextmanager
-def replace_torch_compile():
-    original_compile = torch.compile
-    torch.compile = _COMPILE
-    try:
-        yield
-    finally:
-        torch.compile = original_compile
-
-try:
-    init_torch_compile(torch.compile)
-    from mindspeed.megatron_adaptor import repatch
-except ImportError:
-    repatch = None
 
 from megatron.core import parallel_state as mpu
 
@@ -93,6 +73,25 @@ from verl.workers.config import HFModelConfig, McoreCriticConfig, RolloutConfig
 from verl.workers.critic.megatron_critic import MegatronPPOCritic
 from verl.workers.reward_model.megatron.reward_model import MegatronRewardModel
 from verl.workers.rollout import get_rollout_class
+
+def init_torch_compile(compile):
+    global _COMPILE
+    _COMPILE = compile
+
+@contextmanager
+def replace_torch_compile():
+    original_compile = torch.compile
+    torch.compile = _COMPILE
+    try:
+        yield
+    finally:
+        torch.compile = original_compile
+
+try:
+    init_torch_compile(torch.compile)
+    from mindspeed.megatron_adaptor import repatch
+except ImportError:
+    repatch = None
 
 logger = logging.getLogger(__file__)
 logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
