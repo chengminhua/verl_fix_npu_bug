@@ -14,20 +14,20 @@
 """
 The main entry point to run the PPO algorithm
 """
+
 import datetime
 import logging
 import os
 import time
+from contextlib import contextmanager
 from typing import Any, Optional
 
 import psutil
 import torch
 import torch.distributed
 from codetiming import Timer
-from omegaconf import DictConfig, OmegaConf
-from contextlib import contextmanager
-
 from megatron.core import parallel_state as mpu
+from omegaconf import DictConfig, OmegaConf
 
 from verl import DataProto
 from verl.models.mcore import get_mcore_weight_converter
@@ -74,9 +74,11 @@ from verl.workers.rollout import get_rollout_class
 
 _COMPILE = None
 
+
 def init_torch_compile(compile):
     global _COMPILE
     _COMPILE = compile
+
 
 @contextmanager
 def replace_torch_compile():
@@ -86,6 +88,7 @@ def replace_torch_compile():
         yield
     finally:
         torch.compile = original_compile
+
 
 try:
     init_torch_compile(torch.compile)
