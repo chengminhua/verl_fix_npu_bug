@@ -14,8 +14,6 @@
 """
 The main entry point to run the PPO algorithm
 """
-_COMPILE = None
-
 import datetime
 import logging
 import os
@@ -73,6 +71,8 @@ from verl.workers.config import HFModelConfig, McoreCriticConfig, RolloutConfig
 from verl.workers.critic.megatron_critic import MegatronPPOCritic
 from verl.workers.reward_model.megatron.reward_model import MegatronRewardModel
 from verl.workers.rollout import get_rollout_class
+
+_COMPILE = None
 
 def init_torch_compile(compile):
     global _COMPILE
